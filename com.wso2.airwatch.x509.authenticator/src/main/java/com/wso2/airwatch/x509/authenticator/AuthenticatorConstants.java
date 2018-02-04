@@ -26,6 +26,8 @@ public class AuthenticatorConstants {
     public static final String X509_AUTHENTICATION_STEP_CERTIFICATE_FOUND = "x509_certificate_found";
     public static final String X509_AUTHENTICATION_STEP_CERTIFICATE_VALID = "x509_certificate_valid";
 
+    public static final String X09_AUTHENTICATION_FALLBACK_TO_BASICAUTH = "fallback_basicauth";
+
     public static final String X509_AUTHENTICATION_ROOT_CA_ALIAS_PARAMTER = "CAcertAlias";
     public static final String ALLOW_SELF_SIGNED_CERTS_PARAMETER = "allowSelfSignedCerts";
 

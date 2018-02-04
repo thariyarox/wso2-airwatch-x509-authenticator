@@ -89,17 +89,6 @@ public class WSO2AirWatchAuthenticator extends BasicAuthenticator {
 
         log.info("-----------------initiateAuthenticationRequest method called------------------");
 
-        Object certAuthenticationAttempted = context.getProperty(AuthenticatorConstants.X509_AUTHENTICATION_STEP_ATTEMPTED);
-        if (certAuthenticationAttempted != null) {
-            if ("true".equals(certAuthenticationAttempted.toString())) {
-                // previously it already has tried to authenticate with x509 and failed
-                //change the device type to desktop
-                context.setProperty(AuthenticatorConstants.DEVICE_TYPE_PARAMTER, AuthenticatorConstants.DEVICE_TYPE_DESKTOP);
-                log.info("--------------cert authentication value -------: " + certAuthenticationAttempted.toString());
-                log.info("falling back to basic authentication");
-            }
-        }
-
         boolean terminateAuthenticationFlow = false;
 
         if (context.isRetrying()) {
@@ -108,6 +97,26 @@ public class WSO2AirWatchAuthenticator extends BasicAuthenticator {
                 //if X509 authentication is already attempted previously and if the provided certificate was not valid, show error
 
                 terminateAuthenticationFlow = true;
+            }
+        }
+
+        Object certAuthenticationAttempted = context.getProperty(AuthenticatorConstants.X509_AUTHENTICATION_STEP_ATTEMPTED);
+
+        if (certAuthenticationAttempted != null) {
+            if ("true".equals(certAuthenticationAttempted.toString())) {
+                // previously it already has tried to authenticate with x509 and failed
+                //change the device type to desktop
+                context.setProperty(AuthenticatorConstants.DEVICE_TYPE_PARAMTER, AuthenticatorConstants.DEVICE_TYPE_DESKTOP);
+
+                //Do not treat the next attempt of basic authentication as a retry attempt, to avoid error message displayed in login page
+                if(context.getProperty(AuthenticatorConstants.X09_AUTHENTICATION_FALLBACK_TO_BASICAUTH) == null) {
+                    //This is the first try of basic auth after failing x509 authentication
+                    context.setProperty(AuthenticatorConstants.X09_AUTHENTICATION_FALLBACK_TO_BASICAUTH, "true");
+                    context.setRetrying(false);
+                }
+
+                log.info("--------------cert authentication value -------: " + certAuthenticationAttempted.toString());
+                log.info("falling back to basic authentication");
             }
         }
 
